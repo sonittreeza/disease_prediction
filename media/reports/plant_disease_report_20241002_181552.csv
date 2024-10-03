@@ -1,0 +1,5 @@
+Plant,Number of Uploads,Disease,Detection Count,Average Confidence Score
+plantain,1,Sigatoka Leaf Spot,1,88.00
+palm,1,Fungal Leaf Spot,1,95.00
+Mango,1,Leaf Spot,1,80.00
+mango,1,Anthracnose,1,95.00

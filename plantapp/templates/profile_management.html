@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantID AI - Profile Management</title>
+    <style>
+        /* Common Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        h3 {
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Profile Management</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <h3>Personal Details</h3>
+            <input type="text" name="name" placeholder="Your Name" required value="{{ user.username }}">
+            <input type="email" name="email" placeholder="Your Email" required value="{{ user.email }}">
+            <input type="password" name="password" placeholder="New Password (leave empty to keep current)">
+            <button class="btn" type="submit">Save Changes</button>
+        </form>
+
+        <form method="POST" action="">
+            {% csrf_token %}
+            <h3>Preferences</h3>
+            <label for="privacy">Privacy Settings:</label>
+            <select id="privacy" name="privacy">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+            </select>
+            <button class="btn" type="submit">Save Preferences</button>
+        </form>
+    </div>
+</body>
+</html>

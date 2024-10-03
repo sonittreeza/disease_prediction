@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantID AI - Detection Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .result-item strong {
+            font-weight: bold;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Detection Results</h1>
+
+        {% if result %}
+            <div class="result-item"><strong>Plant Type:</strong> {{ result.plant_type }}</div>
+            <div class="result-item"><strong>Disease:</strong> {{ result.disease }}</div>
+            <div class="result-item"><strong>Description:</strong> {{ result.description }}</div>
+            <div class="result-item"><strong>Recommendation:</strong> {{ result.recommendation }}</div>
+            <div class="result-item"><strong>Confidence Score:</strong> {{ result.confidence_score|floatformat:2 }}%</div>
+        {% else %}
+            <p>No results found. Please try again.</p>
+        {% endif %}
+
+        <a href="{% url 'dashboard' %}" class="back-btn">Go Back</a>
+    </div>
+</body>
+</html>

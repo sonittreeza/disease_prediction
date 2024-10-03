@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Add Chart.js -->
+</head>
+<body>
+    <h1>Plant Disease Visualization</h1>
+
+    <form method="GET" action="">
+        <label for="plant">Select Plant:</label>
+        <select name="plant" id="plant">
+            <option value="">All Plants</option>
+            {% for plant in plants %}
+                <option value="{{ plant.id }}" {% if selected_plant == plant.id|stringformat:"s" %}selected{% endif %}>{{ plant.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="severity">Select Severity:</label>
+        <select name="severity" id="severity">
+            <option value="all" {% if selected_severity == 'all' %}selected{% endif %}>All Severities</option>
+            <option value="low" {% if selected_severity == 'low' %}selected{% endif %}>Low</option>
+            <option value="medium" {% if selected_severity == 'medium' %}selected{% endif %}>Medium</option>
+            <option value="high" {% if selected_severity == 'high' %}selected{% endif %}>High</option>
+        </select>
+
+        <label for="days">Select Days:</label>
+        <select name="days" id="days">
+            <option value="7" {% if selected_days == 7 %}selected{% endif %}>Last 7 Days</option>
+            <option value="30" {% if selected_days == 30 %}selected{% endif %}>Last 30 Days</option>
+            <option value="90" {% if selected_days == 90 %}selected{% endif %}>Last 90 Days</option>
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Filtered Reports</h2>
+
+    <p>Total reports: {{ reports.count }}</p>  <!-- To show if reports are being filtered correctly -->
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Plant</th>
+                <th>Severity</th>
+                <th>Date Generated</th>
+                <th>Report</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.plant.name }}</td>
+                <td>{{ report.report_data }}</td> <!-- You can format report_data based on its content -->
+                <td>{{ report.generated_at }}</td>
+                <td><a href="{{ report.report_file.url }}">Download</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No reports found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Add a section for the chart -->
+    <h2>Report Visualization</h2>
+    <canvas id="reportChart" width="400" height="200"></canvas>
+
+    <script>
+        var ctx = document.getElementById('reportChart').getContext('2d');
+        var reportChart = new Chart(ctx, {
+            type: 'bar', // You can change this to 'line', 'pie', etc.
+            data: {
+                labels: [{% for report in reports %}'{{ report.plant.name }}',{% endfor %}], // Plant names for the x-axis
+                datasets: [{
+                    label: 'Severity Levels',
+                    data: [{% for report in reports %}{{ report.report_data.severity_level }},{% endfor %}], // Severity levels for y-axis
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

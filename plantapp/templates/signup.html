@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        /* Common Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .link {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        /* Error Styles */
+        .errorlist {
+            color: red;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Sign Up</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Only show the field errors when the form has been submitted with errors -->
+            {% for field in form %}
+                <div>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    <!-- Show field-specific errors -->
+                    {% if field.errors %}
+                        <div class="errorlist">
+                            {{ field.errors.as_ul }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button class="btn" type="submit">Sign Up</button>
+        </form>
+        <a href="{% url 'login' %}" class="link">Already have an account? Login</a>
+    </div>
+</body>
+</html>

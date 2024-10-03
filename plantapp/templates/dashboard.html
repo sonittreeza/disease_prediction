@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantID AI - Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .sidebar-menu {
+            list-style-type: none;
+        }
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+        .sidebar-menu a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .search-bar {
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .user-icon {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .dashboard-card {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .disease-summary {
+            display: flex;
+            justify-content: space-between;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .recent-activity {
+            list-style-type: none;
+        }
+        .recent-activity li {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-style: italic;
+            color: #999;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="logo">PlantID AI</div>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</a></li>
+                <li><a href="https://plantdisease-qrfoxbfutqrygzn4p9vejt.streamlit.app/"><i class="fas fa-chart-bar"></i> streamlit</a></li>
+                <li><a href="{% url 'upload_image' %}"><i class="fas fa-file-alt"></i> detected_disease</a></li>
+                <li><a href="{% url 'combined_visualization' %}"><i class="fas fa-file-alt"></i> Visualization</a></li>
+                <li><a href="{% url 'report_list' %}"><i class="fas fa-file-alt"></i> Reports</a></li>
+                <li><a href="{% url 'custom_logout' %}"><i class="fas fa-file-alt"></i> logout</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for plants or diseases...">
+                </div>
+                <div class="user-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header">Disease Summary</div>
+                    <div class="disease-summary">
+                        <div class="summary-item">
+                            <div class="summary-number">{{ total_scans }}</div>
+                            <div>Total Scans</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number">{{ diseases_detected }}</div>
+                            <div>Diseases Detected</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number">{{ accuracy_rate }}%</div>
+                            <div>Accuracy Rate</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header">Recent Activity</div>
+                    <ul class="recent-activity">
+                        {% for activity in recent_activity %}
+                            <li>Detected {{ activity.detected_disease.name }} on {{ activity.plant.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header">Disease Overview</div>
+                    <canvas id="diseaseChart"></canvas>
+                </div>
+                <script>
+                    // Chart data and configuration
+                    const ctx = document.getElementById('diseaseChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: {{ disease_labels|safe }},
+                            datasets: [{
+                                label: 'Number of Detections',
+                                data: {{ disease_detections|safe }},
+                                backgroundColor: [
+                                    'rgba(75, 192, 192, 0.6)',
+                                    'rgba(255, 99, 132, 0.6)',
+                                    'rgba(255, 206, 86, 0.6)',
+                                    'rgba(54, 162, 235, 0.6)',
+                                    'rgba(153, 102, 255, 0.6)'
+                                ],
+                                borderColor: [
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(153, 102, 255, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Detections'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Disease Types'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Top 5 Detected Plant Diseases'
+                                }
+                            }
+                        }
+                    });
+                </script>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
