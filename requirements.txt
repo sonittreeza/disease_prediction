@@ -13,3 +13,4 @@ matplotlib
 gunicorn
 openpyxl
 django-allauth
+plotly
